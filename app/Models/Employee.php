@@ -18,13 +18,13 @@ class Employee extends Model
             'state_id',
             'city_id',
             'department_id',
-            'birthdate',
+            'birth_date',
             'date_hired',
             'zip_code',
     ];
 
     protected $casts = [
-        'birthdate' => 'datetime:Y-m-d',
+        'birth_date' => 'datetime:Y-m-d',
 
         'date_hired' => 'datetime:Y-m-d',
     ];

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CountryResource\Pages;
-use App\Filament\Resources\CountryResource\RelationManagers;
-use App\Models\Country;
+use App\Filament\Resources\DepartmentResource\Pages;
+use App\Filament\Resources\DepartmentResource\RelationManagers;
+use App\Models\Department;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -16,27 +16,26 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CountryResource extends Resource
+class DepartmentResource extends Resource
 {
-    protected static ?string $model = Country::class;
+    protected static ?string $model = Department::class;
+
+    // protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
     protected static ?string $navigationGroup = 'System Management';
-
-    protected static ?int $navigationSort = 2;
+    
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make()
-                ->description()
+                    ->description()
                     ->schema([
                         TextInput::make('name')
                         ->required()
                         ->maxLength(255),
-                        TextInput::make('country_code')
-                        ->required()
-                        ->maxLength(3),
                     ])
             ]);
     }
@@ -47,7 +46,6 @@ class CountryResource extends Resource
             ->columns([
                 TextColumn::make('id')->sortable(),
                 TextColumn::make('name')->sortable()->searchable(),
-                TextColumn::make('country_code')->sortable()->searchable(),
                 TextColumn::make('created_at')->dateTime(),
             ])
             ->filters([
@@ -67,16 +65,15 @@ class CountryResource extends Resource
     {
         return [
             RelationManagers\EmployeesRelationManager::class,
-            RelationManagers\StatesRelationManager::class,
         ];
     }
     
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCountries::route('/'),
-            'create' => Pages\CreateCountry::route('/create'),
-            'edit' => Pages\EditCountry::route('/{record}/edit'),
+            'index' => Pages\ListDepartments::route('/'),
+            'create' => Pages\CreateDepartment::route('/create'),
+            'edit' => Pages\EditDepartment::route('/{record}/edit'),
         ];
     }    
 }
