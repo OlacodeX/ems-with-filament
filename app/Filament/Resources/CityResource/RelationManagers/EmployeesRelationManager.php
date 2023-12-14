@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\CityResource\RelationManagers;
 
+use App\Models\Country;
+use App\Models\State;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -28,13 +31,53 @@ class EmployeesRelationManager extends RelationManager
                         'sm' => 2,
                         'xl' => 2,
                         '2xl' => 3,
-                ]),
-                TextInput::make('first_name')->required()->maxLength(255),
-                TextInput::make('last_name')->required()->maxLength(255),
-                TextInput::make('address')->required()->maxLength(255),
-                TextInput::make('zip_code')->required()->maxLength(6),
-                DatePicker::make('birth_date')->required(),
-                DatePicker::make('date_hired')->required(),
+                ])
+                ->schema([
+                    TextInput::make('first_name')->required()->maxLength(255),
+                    TextInput::make('last_name')->required()->maxLength(255),
+                    Select::make('country_id')
+                    ->label('Country')
+                    ->options(Country::all()->pluck('name','id')->toArray())
+                    ->reactive()
+                    ->afterStateUpdated(fn (callable $set) => $set('state_id', null))
+                    ->required(),
+                    Select::make('state_id')
+                    ->label('State')
+                    ->options(
+                        function (callable $get) {
+                            $country = Country::find($get('country_id'));
+                            if (!$country) {
+                                return [];
+                            }
+                            return $country->states()->pluck('name','id')->toArray();
+                        }
+                        
+                    )
+                    ->reactive()
+                    ->afterStateUpdated(fn (callable $set) => $set('city_id', null))
+                    ->required(),
+                    Select::make('city_id')
+                    ->label('City')
+                    ->options(
+                        function (callable $get) {
+                            $state = State::find($get('state_id'));
+                            if (!$state) {
+                                return [];
+                            }
+                            return $state->cities()->pluck('name','id')->toArray();
+                        }
+                        
+                    )
+                    ->reactive()
+                    ->required(),
+                    Select::make('department_id')
+                    ->relationship(name: 'department', titleAttribute: 'name')
+                    ->required(),
+                    TextInput::make('address')->required()->maxLength(255),
+                    TextInput::make('zip_code')->required()->maxLength(6),
+                    DatePicker::make('birth_date')->required(),
+                    DatePicker::make('date_hired')->required(),
+                ])
             ]);
     }
 
